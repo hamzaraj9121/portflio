@@ -9,8 +9,7 @@ export default function CubeScene() {
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="green" />
       </mesh>
-      cube.rotation.x = time / 2000;
-cube.rotation.y = time / 1000;
+     
     </Canvas>
   );
 }
