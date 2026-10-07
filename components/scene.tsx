@@ -10,7 +10,8 @@ function Cube() {
   useFrame((state, delta) => {
     if (!cubeRef.current) return;
 
-    cubeRef.current.rotation.x += delta;
+    cubeRef.current.rotation.x += delta * 0.75;
+    console.log(cubeRef.current.rotation.x);
     // cubeRef.current.rotation.y += delta * 0.75; 
   });
 
