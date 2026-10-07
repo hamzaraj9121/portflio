@@ -23,8 +23,7 @@ function RotatingBox() {
       scale={1}
     >
       <boxGeometry args={[2, 2, 2]} />
-boxRef.current.position.y =
-  Math.sin(state.clock.elapsedTime) * 1;
+
       <meshStandardMaterial
         color="orange"
         roughness={0.4}
