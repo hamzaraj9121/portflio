@@ -1,75 +1,69 @@
 
 "use client";
 
-import { useRef } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import * as THREE from "three";
 
-function InteractiveCube() {
-  const cubeRef = useRef<THREE.Mesh>(null!);
+function CameraRig() {
+  const { camera } = useThree();
 
   useGSAP(() => {
-    const cube = cubeRef.current;
+    // Make the camera look at the cube
+    camera.lookAt(0, 0, 0);
 
-    // Create smooth animators once
-    const rotateX = gsap.quickTo(cube.rotation, "x", {
-      duration: 1,
-      ease: "power2.out",
+    const timeline = gsap.timeline({
+      repeat: -1,
+      yoyo: true,
     });
 
-    const rotateY = gsap.quickTo(cube.rotation, "y", {
-      duration: 0.4,
-      ease: "power2.out",
+    // Move closer and to the right
+    timeline.to(camera.position, {
+      x: 2,
+      y: 1,
+      z: 4,
+      duration: 2,
+      ease: "power2.inOut",
+      onUpdate: () => camera.lookAt(0, 0, 0),
     });
 
-    function handlePointerMove(
-      event: { pointer: THREE.Vector2 }
-    ) {
-      rotateX(-event.pointer.y * 0.5);
-      rotateY(event.pointer.x * 1.5);
-    }
+    // Move to the left
+    timeline.to(camera.position, {
+      x: -2,
+      y: 0,
+      z: 5,
+      duration: 2,
+      ease: "power2.inOut",
+      onUpdate: () => camera.lookAt(0, 0, 0),
+    });
 
-    // Store the handler for the mesh below
-    cube.userData.handlePointerMove = handlePointerMove;
-  });
+    return () => {
+      timeline.kill();
+    };
+  }, [camera]);
 
+  return null;
+}
+
+function Cube() {
   return (
-    <mesh
-      ref={cubeRef}
-      onPointerMove={(event) => {
-        const handler = cubeRef.current?.userData
-          .handlePointerMove;
-
-        handler?.(event);
-      }}
-      onPointerLeave={() => {
-        gsap.to(cubeRef.current.rotation, {
-          x: 0,
-          y: 0,
-          duration: 0.6,
-          ease: "power2.out",
-        });
-      }}
-    >
+    <mesh>
       <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial
-        color="orange"
-        roughness={0.4}
-        metalness={0.3}
-      />
+      <meshStandardMaterial color="orange" />
     </mesh>
   );
 }
 
-export default function MouseCube() {
+export default function CameraAnimation() {
   return (
     <div className="h-screen">
-      <Canvas camera={{ position: [0, 0, 6] }}>
+      <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
         <ambientLight intensity={1} />
         <directionalLight position={[3, 3, 5]} />
-        <InteractiveCube />
+
+        <CameraRig />
+        <Cube />
       </Canvas>
     </div>
   );
