@@ -1,135 +1,85 @@
 
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const story =
   "I'm Hamza — a full-stack developer. For over three years I've built web and mobile apps with React, Angular, Next.js and Laravel. Lately I've been obsessed with motion — GSAP, Lenis and Three.js — and I vibe-code Flutter apps with AI. I don't just build software. I craft experiences that feel alive.";
 
-export default function Story() {
-  const sectionRef = useRef<HTMLElement>(null);
+export default function StorySection() {
+  const container = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
+  const cursorRef = useRef<HTMLSpanElement>(null);
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+  useGSAP(
+    () => {
+      const text = textRef.current;
+      const cursor = cursorRef.current;
 
-    const section = sectionRef.current;
-    const paragraph = textRef.current;
+      if (!text || !cursor) return;
 
-    if (!section || !paragraph) return;
+      // Prepare individual character spans.
+      text.innerHTML = story
+        .split("")
+        .map(
+          (char) =>
+            `<span style="opacity:0">${
+              char === " " ? "&nbsp;" : char
+            }</span>`
+        )
+        .join("");
 
-    const words = paragraph.querySelectorAll<HTMLElement>(
-      ".story-word"
-    );
+      const characters = text.querySelectorAll("span");
 
-    const media = gsap.matchMedia();
+      gsap.to(characters, {
+        opacity: 1,
+        stagger: 0.035,
+        ease: "none",
+        scrollTrigger: {
+          trigger: container.current,
+          start: "top 65%",
+          end: "+=1800",
+          scrub: 1,
+          pin: true,
+        },
+      });
 
-    media.add(
-      {
-        desktop: "(min-width: 761px)",
-        mobile: "(max-width: 760px)",
-        reduceMotion: "(prefers-reduced-motion: reduce)",
-      },
-      (context) => {
-        const conditions = context.conditions as {
-          desktop: boolean;
-          mobile: boolean;
-          reduceMotion: boolean;
-        };
-
-        if (conditions.reduceMotion) {
-          gsap.set(words, { opacity: 1 });
-          return;
-        }
-
-        gsap.set(words, {
-          opacity: 0.15,
-        });
-
-        const animation = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: () =>
-              `+=${conditions.mobile ? 1400 : 1800}`,
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        animation.to(words, {
+      gsap.fromTo(
+        cursor,
+        { opacity: 0.2 },
+        {
           opacity: 1,
-          stagger: {
-            each: 0.12,
-          },
-          ease: "none",
-        });
-
-        return () => {
-          animation.scrollTrigger?.kill();
-          animation.kill();
-        };
-      }
-    );
-
-    return () => {
-      media.revert();
-    };
-  }, []);
+          repeat: -1,
+          yoyo: true,
+          duration: 0.5,
+          ease: "power1.inOut",
+        }
+      );
+    },
+    { scope: container }
+  );
 
   return (
     <section
-      ref={sectionRef}
+      ref={container}
       id="story"
       className="story-section"
     >
-      <div className="story-container">
-        <div className="story-top">
-          <span className="story-label">
-            <span className="story-label-dot" />
-            THE STORY SO FAR
-          </span>
+      <p className="story-label">04 · STORY</p>
 
-          <span className="story-index">01 / MY JOURNEY</span>
-        </div>
-
-        <div className="story-content">
-          <p className="story-intro">
-            A LITTLE ABOUT ME
-          </p>
-
-          <p
-            ref={textRef}
-            className="story-text"
-            aria-label={story}
-          >
-            {story.split(" ").map((word, index) => (
-              <span
-                key={`${index}-${word}`}
-                className="story-word"
-                aria-hidden="true"
-              >
-                {word}{" "}
-              </span>
-            ))}
-          </p>
-
-          <div className="story-bottom">
-            <span className="story-signature">
-              Always curious. Always building.
-            </span>
-
-            <span className="story-scroll">
-              KEEP SCROLLING
-              <span aria-hidden="true"> ↓</span>
-            </span>
-          </div>
-        </div>
-      </div>
+      <h2 className="story-heading">
+        <p ref={textRef} className="story-text" />
+        <span
+          ref={cursorRef}
+          className="story-cursor"
+          aria-hidden="true"
+        />
+      </h2>
     </section>
   );
 }
