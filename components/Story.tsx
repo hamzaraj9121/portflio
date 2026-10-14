@@ -18,48 +18,51 @@ export default function StorySection() {
 
   useGSAP(
     () => {
+      const section = container.current;
       const text = textRef.current;
       const cursor = cursorRef.current;
 
-      if (!text || !cursor) return;
+      if (!section || !text || !cursor) return;
 
-      // Prepare individual character spans.
-      text.innerHTML = story
-        .split("")
-        .map(
-          (char) =>
-            `<span style="opacity:0">${
-              char === " " ? "&nbsp;" : char
-            }</span>`
-        )
-        .join("");
+      // Create character spans safely.
+      const characters = Array.from(story).map((char) => {
+        const span = document.createElement("span");
 
-      const characters = text.querySelectorAll("span");
+        span.textContent = char === " " ? "\u00A0" : char;
+        span.className = "story-character";
 
-      gsap.to(characters, {
-        opacity: 1,
-        stagger: 0.035,
-        ease: "none",
+        text.appendChild(span);
+
+        return span;
+      });
+
+      gsap.set(characters, { opacity: 0.15 });
+
+      const timeline = gsap.timeline({
         scrollTrigger: {
-          trigger: container.current,
-          start: "top 65%",
+          trigger: section,
+          start: "top top",
           end: "+=1800",
           scrub: 1,
           pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
         },
       });
 
-      gsap.fromTo(
-        cursor,
-        { opacity: 0.2 },
-        {
-          opacity: 1,
-          repeat: -1,
-          yoyo: true,
-          duration: 0.5,
-          ease: "power1.inOut",
-        }
-      );
+      timeline.to(characters, {
+        opacity: 1,
+        stagger: 0.035,
+        ease: "none",
+      });
+
+      gsap.to(cursor, {
+        opacity: 0.15,
+        repeat: -1,
+        yoyo: true,
+        duration: 0.5,
+        ease: "power1.inOut",
+      });
     },
     { scope: container }
   );
@@ -70,16 +73,35 @@ export default function StorySection() {
       id="story"
       className="story-section"
     >
-      <p className="story-label">04 · STORY</p>
+      <div className="story-inner">
+        <p className="story-label">04 · STORY</p>
 
-      <h2 className="story-heading">
-        <p ref={textRef} className="story-text" />
-        <span
-          ref={cursorRef}
-          className="story-cursor"
-          aria-hidden="true"
-        />
-      </h2>
+        <h2 className="story-heading">
+          <span className="story-intro">
+            A LITTLE ABOUT ME
+          </span>
+
+          <span className="story-accessible">
+            {story}
+          </span>
+
+          <span
+            ref={textRef}
+            className="story-text"
+            aria-hidden="true"
+          />
+
+          <span
+            ref={cursorRef}
+            className="story-cursor"
+            aria-hidden="true"
+          />
+        </h2>
+
+        <p className="story-footer">
+          Always curious. Always building.
+        </p>
+      </div>
     </section>
   );
 }
