@@ -1,20 +1,21 @@
-// import Scene from "@/components/scene";
-// import Scene from "@/components/scene";
 
-// import Scene from "@/components/scene";
-import CameraAnimation from "@/components/mouseCube";
-// import MouseCube from "@/components/mouseCube";
-// import ScrollCube from "@/components/ScrollCube";
-// import Scene from "@/components/scene";
-
-// import CubeScene from "@/components/cubescene";
+import Header from "@/components/Header";
+import Hero from "@/components/HeroSection";
 
 
-export default function Page() {
+export default function Home() {
   return (
     <main>
-    
-    <CameraAnimation />
+      <Header />
+      <Hero/>
+
+      <section id="skills" className="min-h-screen">
+        {/* Skills section */}
+      </section>
+
+      <section id="contact" className="min-h-screen">
+        {/* Contact section */}
+      </section>
     </main>
   );
 }

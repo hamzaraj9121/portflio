@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Canvas, useThree } from "@react-three/fiber";
@@ -21,8 +20,8 @@ function CameraRig() {
     // Move closer and to the right
     timeline.to(camera.position, {
       x: 2,
-      y: 1,
-      z: 4,
+      y: 0,
+      z: 3,
       duration: 2,
       ease: "power2.inOut",
       onUpdate: () => camera.lookAt(0, 0, 0),
