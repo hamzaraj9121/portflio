@@ -1,9 +1,12 @@
 
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type Skill = {
   number: string;
@@ -69,60 +72,52 @@ export default function Skills() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+  useGSAP(
+    () => {
+      const section = sectionRef.current;
+      const viewport = viewportRef.current;
+      const track = trackRef.current;
 
-    const section = sectionRef.current;
-    const viewport = viewportRef.current;
-    const track = trackRef.current;
+      if (!section || !viewport || !track) return;
 
-    if (!section || !viewport || !track) return;
+      const media = gsap.matchMedia();
 
-    const media = gsap.matchMedia();
+      media.add(
+        {
+          desktop: "(min-width: 761px)",
+          mobile: "(max-width: 760px)",
+          reduceMotion: "(prefers-reduced-motion: reduce)",
+        },
+        (context) => {
+          const conditions = context.conditions as {
+            desktop: boolean;
+            mobile: boolean;
+            reduceMotion: boolean;
+          };
 
-    media.add(
-      {
-        desktop: "(min-width: 761px)",
-        mobile: "(max-width: 760px)",
-        reduceMotion: "(prefers-reduced-motion: reduce)",
-      },
-      (context) => {
-        const conditions = context.conditions as {
-          desktop: boolean;
-          mobile: boolean;
-          reduceMotion: boolean;
-        };
+          if (conditions.reduceMotion) return;
 
-        if (conditions.reduceMotion) return;
+          const getDistance = () =>
+            Math.max(0, track.scrollWidth - viewport.clientWidth);
 
-        const getDistance = () =>
-          Math.max(0, track.scrollWidth - viewport.clientWidth);
-
-        gsap.to(track, {
-          x: () => -getDistance(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: () => `+=${getDistance()}`,
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-      }
-    );
-
-    const refresh = () => ScrollTrigger.refresh();
-
-    window.addEventListener("resize", refresh);
-
-    return () => {
-      window.removeEventListener("resize", refresh);
-      media.revert();
-    };
-  }, []);
+          gsap.to(track, {
+            x: () => -getDistance(),
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: "top top",
+              end: () => `+=${getDistance()}`,
+              pin: true,
+              pinSpacing: true,
+              scrub: 1,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
+      );
+    },
+    { scope: sectionRef }
+  );
 
   return (
     <section

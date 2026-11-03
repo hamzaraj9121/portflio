@@ -1,11 +1,12 @@
 
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const projects = [
   {
@@ -37,75 +38,74 @@ const projects = [
 export default function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
+  useGSAP(
+    () => {
+      const section = sectionRef.current;
+      if (!section) return;
 
-   const ctx = gsap.context(() => {
-  const cards = gsap.utils.toArray<HTMLElement>(".project-card");
+      const cards = gsap.utils.toArray<HTMLElement>(".project-card", section);
 
-  gsap.set(cards, {
-    xPercent: -50,
-    yPercent: -50,
-    x: () => window.innerWidth * 0.55,
-    y: () => -window.innerHeight * 0.55,
-    rotation: 8,
-    scale: 0.94,
-    opacity: 0,
-  });
+      gsap.set(cards, {
+        xPercent: -50,
+        yPercent: -50,
+        x: () => window.innerWidth * 0.55,
+        y: () => -window.innerHeight * 0.55,
+        rotation: 8,
+        scale: 0.94,
+        opacity: 0,
+      });
 
-  const timeline = gsap.timeline({
-    scrollTrigger: {
-      trigger: section,
-      start: "top top",
-      end: `+=${cards.length * 100}%`,
-      pin: true,
-      scrub: 1,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-    },
-  });
-
-  cards.forEach((card, index) => {
-    if (index > 0) {
-      timeline.to(
-        cards.slice(0, index),
-        {
-          x: -24,
-          y: 20,
-          scale: 0.94,
-          rotation: -2,
-          opacity: 0.7,
-          duration: 1,
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: () => `+=${cards.length * window.innerHeight}`,
+          pin: true,
+          pinSpacing: true,
+          scrub: 1,
+          invalidateOnRefresh: true,
         },
-        index
-      );
-    }
+      });
 
-    timeline.to(
-      card,
-      {
-        x: 0,
-        y: 0,
-        rotation: 0,
-        scale: 1,
-        opacity: 1,
-        duration: 1,
-        ease: "power3.out",
-      },
-      index
-    );
-  });
-}, section);
+      cards.forEach((card, index) => {
+        if (index > 0) {
+          timeline.to(
+            cards.slice(0, index),
+            {
+              x: -28,
+              y: 24,
+              scale: 0.94,
+              rotation: -2,
+              opacity: 0.7,
+              duration: 1,
+            },
+            index
+          );
+        }
 
-return () => ctx.revert();
-  }, []);
+        timeline.to(
+          card,
+          {
+            x: 0,
+            y: 0,
+            rotation: 0,
+            scale: 1,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+          },
+          index
+        );
+      });
+    },
+    { scope: sectionRef }
+  );
 
   return (
     <section
       ref={sectionRef}
       id="projects"
-      className="relative h-screen overflow-hidden bg-[#f8f6f0] text-neutral-900"
+      className="relative min-h-screen min-h-[100svh] overflow-hidden bg-[#f8f6f0] text-neutral-900"
     >
       {/* Background details */}
       <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(#c9c5bb_1px,transparent_1px)] [background-size:28px_28px]" />
@@ -123,25 +123,14 @@ return () => ctx.revert();
         {projects.map((project, index) => (
           <article
             key={project.number}
-            className="
-  project-card
-  absolute left-1/2 top-1/2
-  w-[88vw] max-w-[760px]
-  -translate-x-1/2 -translate-y-1/2
-  rounded-[28px]
-  border border-white/80
-  bg-[#fffdf8]
-  p-6 sm:p-8 md:p-10
-  shadow-[0_30px_70px_rgba(0,0,0,0.12)]
-  fixed top-8 left-1/2 z-50 -translate-x-1/2
-"
+            className="project-card absolute left-1/2 top-1/2 w-[88vw] max-w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/80 bg-[#fffdf7] p-6 shadow-[0_30px_70px_rgba(0,0,0,0.12)] lg:w-[390px] lg:h-[470px]"
             style={{ zIndex: index + 1 }}
           >
-            <span className="mb-5 block font-mono text-sm tracking-[0.3em] text-amber-600">
+            <span className="mb-3 block font-mono text-sm tracking-[0.3em] text-amber-600">
               {project.number}
             </span>
 
-            <div className="mb-5 aspect-[2.2/1] overflow-hidden rounded-2xl bg-neutral-200">
+            <div className="mb-4 h-[140px] overflow-hidden rounded-2xl bg-neutral-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={project.image}
@@ -150,19 +139,19 @@ return () => ctx.revert();
               />
             </div>
 
-            <h2 className="font-mono text-2xl leading-tight tracking-tight sm:text-4xl md:text-5xl">
+            <h2 className="font-mono text-2xl leading-tight tracking-tight">
               {project.title}
             </h2>
 
-            <p className="mt-4 max-w-lg text-sm leading-7 text-neutral-600 sm:text-base">
+            <p className="mt-3 max-w-lg text-sm leading-6 text-neutral-600">
               {project.description}
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-1.5">
               {project.technologies.map((technology) => (
                 <span
                   key={technology}
-                  className="rounded-full border border-neutral-200 px-4 py-2 text-xs text-neutral-600 sm:text-sm"
+                  className="rounded-full border border-neutral-200 px-3 py-1 text-xs text-neutral-600"
                 >
                   {technology}
                 </span>
