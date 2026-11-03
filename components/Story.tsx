@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRef } from "react";
@@ -9,34 +8,76 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const story =
-  "I'm Hamza — a full-stack developer. For over three years I've built web and mobile apps with React, Angular, Next.js and Laravel. Lately I've been obsessed with motion — GSAP, Lenis and Three.js — and I vibe-code Flutter apps with AI. I don't just build software. I craft experiences that feel alive.I have hands-on experience with MongoDB, Express.js, React.js, and Node.js, along with Next.js, TypeScript, JavaScript, Tailwind CSS, REST APIs, Git, and GitHub. I have worked on full-stack projects involving frontend development, backend APIs, database integration, authentication, and responsive user interfaces.";
+  "I'm Hamza — a full-stack developer. I specialize in building modern, responsive web applications using React, Next.js, and TypeScript. My passion is turning creative ideas into meaningful digital experiences. I'm constantly exploring artificial intelligence, AI agents, and interactive 3D web experiences to push the boundaries of what I can build.";
 
 export default function Story() {
   const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
+  const introCursorRef = useRef<HTMLSpanElement>(null);
 
   useGSAP(
     () => {
       const section = sectionRef.current;
       const paragraph = textRef.current;
+      const introCursor = introCursorRef.current;
 
-      if (!section || !paragraph) return;
+      if (!section || !paragraph || !introCursor) return;
 
       const characters =
-        paragraph.querySelectorAll<HTMLElement>(".story-char");
+        paragraph.querySelectorAll<HTMLSpanElement>(".story-character");
+      const animation = { progress: 0 };
+      const cursorOnlyProgress = 0.12;
+      let revealedCount = 0;
+      let caretIndex = -1;
 
-      gsap.set(characters, { opacity: 0.14 });
+      characters.forEach((character) => {
+        character.classList.remove("is-revealed", "is-caret");
+      });
+      introCursor.classList.remove("is-hidden");
 
-      gsap.to(characters, {
-        opacity: 1,
-        ease: "none",
-        stagger: {
-          amount: 1.5,
-        },
+      const updateReveal = () => {
+        const isCursorOnly = animation.progress < cursorOnlyProgress;
+        const revealProgress =
+          (animation.progress - cursorOnlyProgress) /
+          (1 - cursorOnlyProgress);
+        const nextCount = isCursorOnly
+          ? 0
+          : Math.min(
+              characters.length,
+              1 + Math.floor(revealProgress * (characters.length - 1))
+            );
+
+        introCursor.classList.toggle("is-hidden", !isCursorOnly);
+
+        if (nextCount > revealedCount) {
+          for (let index = revealedCount; index < nextCount; index += 1) {
+            characters[index]?.classList.add("is-revealed");
+          }
+        } else if (nextCount < revealedCount) {
+          for (let index = nextCount; index < revealedCount; index += 1) {
+            characters[index]?.classList.remove("is-revealed");
+          }
+        }
+
+        revealedCount = nextCount;
+        const nextCaretIndex = nextCount - 1;
+
+        if (nextCaretIndex !== caretIndex) {
+          if (caretIndex >= 0) {
+            characters[caretIndex]?.classList.remove("is-caret");
+          }
+          if (nextCaretIndex >= 0) {
+            characters[nextCaretIndex]?.classList.add("is-caret");
+          }
+          caretIndex = nextCaretIndex;
+        }
+      };
+
+      const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: "+=2200",
+          end: () => `+=${Math.max(window.innerHeight * 3, 2400)}`,
           pin: true,
           pinSpacing: true,
           scrub: 1,
@@ -44,7 +85,12 @@ export default function Story() {
         },
       });
 
-      requestAnimationFrame(() => ScrollTrigger.refresh());
+      timeline.to(animation, {
+        progress: 1,
+        duration: 1,
+        ease: "none",
+        onUpdate: updateReveal,
+      });
     },
     { scope: sectionRef }
   );
@@ -52,32 +98,34 @@ export default function Story() {
   return (
     <section
       ref={sectionRef}
+      id="story"
       aria-label="My story"
       className="relative flex min-h-screen min-h-[100svh] items-center justify-center overflow-clip bg-[#f6f5f0] text-[#242420]"
     >
-      <div className="mx-auto w-[calc(100%-40px)] max-w-[1100px] sm:w-[calc(100%-64px)]">
-        <p className="mb-6 text-[12px] font-semibold uppercase tracking-[0.2em] text-[#a18a52] sm:mb-9">
-          MY STORY
-        </p>
+      <p className="absolute left-1/2 top-[22%] m-0 -translate-x-1/2 text-center text-[12px] font-semibold uppercase tracking-[0.2em] text-[#a18a52]">
+        MY STORY
+      </p>
 
+      <span
+        ref={introCursorRef}
+        aria-hidden="true"
+        className="story-intro-cursor pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      />
+
+      <div className="absolute inset-0 flex items-center justify-center px-5 sm:px-8">
         <p
           ref={textRef}
-          className="m-0 text-[clamp(29px,7.2vw,42px)] font-medium leading-[1.4] tracking-[-0.045em] sm:text-[clamp(36px,4.4vw,62px)] sm:leading-[1.3]"
+          aria-label={story}
+          className="m-0 w-full max-w-[880px] text-center font-mono text-[28px] font-medium leading-[1.35] md:text-[36px] lg:text-[44px]"
         >
-          {story.split("").map((character, index) => (
-            <span
-              key={index}
-              className="story-char inline opacity-[0.14] [will-change:opacity]"
-              aria-hidden="true"
-            >
-              {character === " " ? "\u00A0" : character}
-            </span>
-          ))}
+          <span aria-hidden="true">
+            {Array.from(story, (character, index) => (
+              <span className="story-character" key={index}>
+                {character}
+              </span>
+            ))}
+          </span>
         </p>
-
-        <span className="mt-8 block text-[10px] tracking-[0.16em] text-[#88877f] sm:mt-[42px]">
-          FULL-STACK DEVELOPER · CREATIVE TECHNOLOGIST
-        </span>
       </div>
     </section>
   );

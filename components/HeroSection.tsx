@@ -28,7 +28,7 @@ function Robot() {
     y: 0,
   });
 
-  const initialPosition = useRef(0);
+  const initialPosition = useRef(-2);
 
   useEffect(() => {
     const handleMouseMove = (event: globalThis.MouseEvent) => {
@@ -76,13 +76,13 @@ function Robot() {
   });
 
   return (
-    <group
-      ref={robotRef}
-      position={[0, -2, -3]}
-      scale={2.1}
-    >
-      <primitive object={scene} />
-    </group>
+   <group
+  ref={robotRef}
+  position={[0, -2, -3]}
+  scale={2.1}
+>
+  <primitive object={scene} />
+</group>
   );
 }
 
