@@ -19,7 +19,7 @@ import * as THREE from "three";
 // ----------------------------------
 
 function Robot() {
-  const { scene } = useGLTF("/models/friendly_robot.glb") as any;
+  const { scene } = useGLTF("/models/robo.glb") as any;
 
   const robotRef = useRef<THREE.Group>(null);
 

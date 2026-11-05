@@ -8,7 +8,7 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const story =
-  "I'm Hamza — a full-stack developer. I specialize in building modern, responsive web applications using React, Next.js, and TypeScript. My passion is turning creative ideas into meaningful digital experiences. I'm constantly exploring artificial intelligence, AI agents, and interactive 3D web experiences to push the boundaries of what I can build.";
+  "I'm Hamza — a full-stack developer. I specialize in building modern, responsive web applications using React, Next.js, and TypeScript. My passion is turning creative ideas into meaningful digital experiences.";
 
 export default function Story() {
   const sectionRef = useRef<HTMLElement>(null);
