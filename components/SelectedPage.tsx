@@ -45,21 +45,11 @@ export default function ProjectsSection() {
 
       const cards = gsap.utils.toArray<HTMLElement>(".project-card", section);
 
-      gsap.set(cards, {
-        xPercent: -50,
-        yPercent: -50,
-        x: () => window.innerWidth * 0.55,
-        y: () => -window.innerHeight * 0.55,
-        rotation: 8,
-        scale: 0.94,
-        opacity: 0,
-      });
-
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: () => `+=${cards.length * window.innerHeight}`,
+          end: () => `+=${cards.length * section.offsetHeight}`,
           pin: true,
           pinSpacing: true,
           scrub: 1,
@@ -83,9 +73,20 @@ export default function ProjectsSection() {
           );
         }
 
-        timeline.to(
+        timeline.fromTo(
           card,
           {
+            xPercent: -50,
+            yPercent: -50,
+            x: () => section.clientWidth * 0.55,
+            y: () => -section.offsetHeight * 0.55,
+            rotation: 8,
+            scale: 0.94,
+            opacity: 0,
+          },
+          {
+            xPercent: -50,
+            yPercent: -50,
             x: 0,
             y: 0,
             rotation: 0,
@@ -105,7 +106,7 @@ export default function ProjectsSection() {
     <section
       ref={sectionRef}
       id="projects"
-      className="relative min-h-screen min-h-[100svh] overflow-hidden bg-[#f8f6f0] text-neutral-900"
+      className="relative min-h-[100svh] overflow-hidden bg-[#f8f6f0] text-neutral-900"
     >
       {/* Background details */}
       <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(#c9c5bb_1px,transparent_1px)] [background-size:28px_28px]" />
