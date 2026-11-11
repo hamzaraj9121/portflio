@@ -124,7 +124,7 @@ export default function ProjectsSection() {
         {projects.map((project, index) => (
           <article
             key={project.number}
-            className="project-card absolute left-1/2 top-1/2 w-[88vw] max-w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/80 bg-[#fffdf7] p-6 shadow-[0_30px_70px_rgba(0,0,0,0.12)] lg:w-[390px] lg:h-[470px]"
+            className="project-card absolute left-1/2 top-1/2 w-[88vw] max-w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/80 bg-[#fffdf7] p-6 shadow-[0_30px_70px_rgba(0,0,0,0.12)] lg:w-[390px] lg:h-[370px]"
             style={{ zIndex: index + 1 }}
           >
             <span className="mb-3 block font-mono text-sm tracking-[0.3em] text-amber-600">

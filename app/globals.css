@@ -677,7 +677,7 @@ body {
   position: absolute;
   top: 0.05em;
   left: 100%;
-  width: 0.06em;
+ width: 0.24em;;
   height: 1.15em;
   background: #d5a900;
   content: "";
@@ -685,7 +685,7 @@ body {
 }
 
 .story-intro-cursor {
-  width: 0.06em;
+  width: 0.24em;
   height: 1.15em;
   background: #d5a900;
   animation: story-caret 1s ease-in-out infinite;

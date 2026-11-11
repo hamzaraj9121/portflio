@@ -8,6 +8,10 @@ import Lenis from "lenis";
 export default function ScrollCoordinator() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    // Let the debounced resize handler refresh pins after Lenis and breakpoints settle.
+    ScrollTrigger.config({
+      autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
+    });
 
     const lenis = new Lenis({
       autoRaf: false,
@@ -21,6 +25,8 @@ export default function ScrollCoordinator() {
     gsap.ticker.add(updateLenis);
 
     let refreshFrame = 0;
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+    let resizeScrollY: number | undefined;
     let isActive = true;
     const refreshAll = () => {
       if (refreshFrame) cancelAnimationFrame(refreshFrame);
@@ -29,6 +35,26 @@ export default function ScrollCoordinator() {
         ScrollTrigger.sort();
         ScrollTrigger.refresh();
       });
+    };
+
+    const handleResize = () => {
+      if (!resizeTimer) resizeScrollY = window.scrollY;
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        resizeTimer = undefined;
+        const scrollY = resizeScrollY;
+        resizeScrollY = undefined;
+        refreshAll();
+        if (scrollY !== undefined) {
+          requestAnimationFrame(() => {
+            lenis.resize();
+            lenis.scrollTo(Math.min(scrollY, lenis.limit), {
+              immediate: true,
+              force: true,
+            });
+          });
+        }
+      }, 250);
     };
 
     const timer = setTimeout(refreshAll, 120);
@@ -40,12 +66,16 @@ export default function ScrollCoordinator() {
     }
 
     window.addEventListener("load", refreshAll);
+    window.addEventListener("resize", handleResize);
 
     return () => {
       isActive = false;
       clearTimeout(timer);
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeScrollY = undefined;
       if (refreshFrame) cancelAnimationFrame(refreshFrame);
       window.removeEventListener("load", refreshAll);
+      window.removeEventListener("resize", handleResize);
       gsap.ticker.remove(updateLenis);
       unsubscribeScroll();
       lenis.destroy();
