@@ -40,6 +40,7 @@ const testimonials = [
 
 const cardRotations = [-3, 2.5, -1.8, 3.2];
 
+
 export default function KindWords() {
   const sectionRef = useRef<HTMLElement>(null);
 

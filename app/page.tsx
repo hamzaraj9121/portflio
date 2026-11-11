@@ -1,3 +1,4 @@
+import AboutSection from "@/components/about";
 import ContactSection from "@/components/contectSection";
 import Footer from "@/components/footer";
 import Header from "@/components/Header";
@@ -15,6 +16,7 @@ export default function Home() {
       <Header />
       <Hero />
       <Skills />
+      <AboutSection/>
       <SelectedProjects />
       <Story />
       <KindWords />
