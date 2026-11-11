@@ -7,14 +7,21 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(useGSAP);
 
 const navItems = [
-  { label: "Home", href: "#home" },
-  { label: "Skills", href: "#skills" },
-  { label: "About", href: "#story" },
-  { label: "Story", href: "#story" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
-  { label: "Reviews", href: "#kind-words" },
+  { label: "Home", href: "#home", sectionId: "home" },
+  { label: "Skills", href: "#skills", sectionId: "skills" },
+  { label: "About", href: "#about", sectionId: "about" },
+  { label: "Projects", href: "#projects", sectionId: "projects" },
+  { label: "Story", href: "#story", sectionId: "story" },
+  { label: "Reviews", href: "#kind-words", sectionId: "kind-words" },
+  { label: "Contact", href: "#contact", sectionId: "contact" },
 ];
+
+type ActiveIndicator = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
 
 function PortfolioLogo({ markOnly = false }: { markOnly?: boolean }) {
   return (
@@ -37,12 +44,84 @@ function PortfolioLogo({ markOnly = false }: { markOnly?: boolean }) {
 
 export default function Header() {
   const [active, setActive] = useState("Home");
+  const [activeIndicator, setActiveIndicator] =
+    useState<ActiveIndicator | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const desktopNavRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const hasScrolledRef = useRef(false);
   const [headerVisible, setHeaderVisible] = useState(true);
+
+  useEffect(() => {
+    let updateFrame = 0;
+
+    const updateActiveSection = () => {
+      updateFrame = 0;
+      const activationLine = window.innerHeight * 0.3;
+      let currentSection = navItems[0];
+
+      for (const item of navItems) {
+        const section = document.getElementById(item.sectionId);
+        if (section && section.getBoundingClientRect().top <= activationLine) {
+          currentSection = item;
+        }
+      }
+
+      setActive((current) =>
+        current === currentSection.label ? current : currentSection.label
+      );
+    };
+
+    const scheduleActiveSectionUpdate = () => {
+      if (!updateFrame) {
+        updateFrame = requestAnimationFrame(updateActiveSection);
+      }
+    };
+
+    window.addEventListener("scroll", scheduleActiveSectionUpdate, {
+      passive: true,
+    });
+    window.addEventListener("resize", scheduleActiveSectionUpdate);
+    updateActiveSection();
+
+    return () => {
+      window.removeEventListener("scroll", scheduleActiveSectionUpdate);
+      window.removeEventListener("resize", scheduleActiveSectionUpdate);
+      if (updateFrame) cancelAnimationFrame(updateFrame);
+    };
+  }, []);
+
+  useEffect(() => {
+    const desktopNav = desktopNavRef.current;
+    if (!desktopNav) return;
+
+    const updateIndicator = () => {
+      const activeLink = Array.from(
+        desktopNav.querySelectorAll<HTMLAnchorElement>("[data-nav-label]")
+      ).find((link) => link.dataset.navLabel === active);
+
+      if (!activeLink) return;
+
+      setActiveIndicator({
+        left: activeLink.offsetLeft,
+        top: activeLink.offsetTop,
+        width: activeLink.offsetWidth,
+        height: activeLink.offsetHeight,
+      });
+    };
+
+    updateIndicator();
+    const resizeObserver = new ResizeObserver(updateIndicator);
+    resizeObserver.observe(desktopNav);
+    window.addEventListener("resize", updateIndicator);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateIndicator);
+    };
+  }, [active]);
 
   useGSAP(
     () => {
@@ -192,17 +271,37 @@ export default function Header() {
           <PortfolioLogo />
         </a>
 
-        <div className="hidden flex-1 items-center justify-center gap-0.5 md:flex">
+        <div
+          ref={desktopNavRef}
+          className="relative hidden flex-1 items-center justify-center gap-0.5 md:flex"
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 top-0 z-0 rounded-full
+            bg-[#f5b826] transition-[transform,width,height] duration-500 ease-out
+            motion-reduce:transition-none"
+            style={
+              activeIndicator
+                ? {
+                    width: activeIndicator.width,
+                    height: activeIndicator.height,
+                    transform: `translate(${activeIndicator.left}px, ${activeIndicator.top}px)`,
+                  }
+                : { opacity: 0 }
+            }
+          />
           {navItems.map(({ label, href }) => (
             <a
               key={label}
               href={href}
+              data-nav-label={label}
+              aria-current={active === label ? "page" : undefined}
               onClick={() => setActive(label)}
-              className={`rounded-full px-3 py-2.5 font-mono text-[11px]
-                tracking-[0.04em] transition-all duration-300
+              className={`relative z-10 rounded-full px-3 py-2.5 font-mono text-[11px]
+                tracking-[0.04em] transition-colors duration-300
                 ${
                   active === label
-                    ? "bg-[#f5b826] text-[#171717]"
+                    ? "text-[#171717]"
                     : "text-[#353535] hover:bg-black/[0.04] hover:text-black"
                 }`}
             >
@@ -299,6 +398,7 @@ export default function Header() {
               <a
                 key={label}
                 href={href}
+                aria-current={active === label ? "page" : undefined}
                 onClick={() => {
                   setActive(label);
                   setMenuOpen(false);
