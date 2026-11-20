@@ -13,26 +13,34 @@ const projects = [
     number: "01",
     title: "HabitPulse Analytics",
     description:
-      "A habit tracking and analytics application built with Next.js and MongoDB.",
-    technologies: ["Next.js", "TypeScript", "MongoDB"],
-    image: "/projects/habitpulse.png",
+      "Habit Tracker that helps users create, manage, and track their daily habits to build consistency and improve productivity.",
+    technologies: ["Next.js", "TypeScript", "Express" ,"Node","MongoDB"],
+    image: "/projects/HABIT analyzer.png",
   },
   {
     number: "02",
-    title: "Food Landing Page",
+    title: "Lazy Desk ",
     description:
-      "An elegant restaurant landing page featuring beautiful visuals and smooth interactions.",
-    technologies: ["React", "Tailwind CSS", "GSAP"],
-    image: "/projects/food.png",
+      " Lazy Desk that help organize messy files, turn notes into summaries, and extract actionable tasks",
+    technologies: ["React", "Tailwind CSS", "Ollama" ,"Gemma4","Github"],
+    image: "/projects/lazy-desj.png",
   },
   {
     number: "03",
-    title: "Tax-Solution Website",
+    title: "Clothing Store E-commerce",
     description:
-      "A modern, responsive business website built with Angular.",
-    technologies: ["Angular", "HTML", "CSS"],
-    image: "/projects/tax.png",
+      "A modern, responsive business website built with Tailwind CSS Javascript Typescript and Next.js.",
+    technologies: ["Next.js", "TypeScript", "Tailwind CSS ,Express,Node.js,MongoDB"],
+    image: "/projects/Clothix Heritage Craft Display.png",
   },
+    {
+    number: "04",
+    title: "Clothing Store E-commerce",
+    description:
+      "A modern, responsive business website built with Tailwind CSS Javascript Typescript and Next.js.",
+    technologies: ["Next.js", "TypeScript","Express","Node.js", "Tailwind CSS"],
+    image: "/projects/Screenshot 2026-11-11 142756.png",
+  }
 ];
 
 export default function ProjectsSection() {
@@ -127,11 +135,7 @@ export default function ProjectsSection() {
             className="project-card absolute left-1/2 top-1/2 w-[88vw] max-w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/80 bg-[#fffdf7] p-6 shadow-[0_30px_70px_rgba(0,0,0,0.12)] lg:w-[390px] lg:h-[370px]"
             style={{ zIndex: index + 1 }}
           >
-            <span className="mb-3 block font-mono text-sm tracking-[0.3em] text-amber-600">
-              {project.number}
-            </span>
-
-            <div className="mb-4 h-[140px] overflow-hidden rounded-2xl bg-neutral-200">
+            <div className="mb-4 mt-4 h-[140px] overflow-hidden  bg-neutral-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={project.image}
@@ -148,7 +152,7 @@ export default function ProjectsSection() {
               {project.description}
             </p>
 
-            <div className="mt-4 flex flex-wrap gap-1.5">
+            <div className="mx-4  flex flex-wrap gap-1.5">
               {project.technologies.map((technology) => (
                 <span
                   key={technology}

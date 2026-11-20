@@ -17,11 +17,11 @@ const socials = [
 ];
 
 const marqueeItems = [
-  "DEVELOPER",
-  "VIBE CODING WITH AI",
+  "AI AUTOMATION DEVELOPER",
+  "Agentic Ai",
   "AVAILABLE FOR WORK",
   "LET'S BUILD",
-  "FULL-STACK DEVELOPER",
+  "AI POWERED FULL-STACK DEVELOPER",
 ];
 
 export default function Footer() {

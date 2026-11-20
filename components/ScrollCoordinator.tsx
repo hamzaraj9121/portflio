@@ -17,6 +17,9 @@ export default function ScrollCoordinator() {
       autoRaf: false,
       anchors: true,
     });
+    if (document.querySelector("[data-site-preloader]")) {
+      lenis.stop();
+    }
     const unsubscribeScroll = lenis.on("scroll", () =>
       ScrollTrigger.update()
     );
@@ -35,6 +38,11 @@ export default function ScrollCoordinator() {
         ScrollTrigger.sort();
         ScrollTrigger.refresh();
       });
+    };
+
+    const handlePreloaderComplete = () => {
+      lenis.start();
+      refreshAll();
     };
 
     const handleResize = () => {
@@ -67,6 +75,10 @@ export default function ScrollCoordinator() {
 
     window.addEventListener("load", refreshAll);
     window.addEventListener("resize", handleResize);
+    window.addEventListener(
+      "portfolio:preloader-complete",
+      handlePreloaderComplete
+    );
 
     return () => {
       isActive = false;
@@ -76,6 +88,10 @@ export default function ScrollCoordinator() {
       if (refreshFrame) cancelAnimationFrame(refreshFrame);
       window.removeEventListener("load", refreshAll);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener(
+        "portfolio:preloader-complete",
+        handlePreloaderComplete
+      );
       gsap.ticker.remove(updateLenis);
       unsubscribeScroll();
       lenis.destroy();

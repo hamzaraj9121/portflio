@@ -78,8 +78,8 @@ function Robot() {
   return (
    <group
   ref={robotRef}
-  position={[0, -2, -3]}
-  scale={2.1}
+ position={[0, 0, -3]}
+      scale={2.1}
 >
   <primitive object={scene} />
 </group>

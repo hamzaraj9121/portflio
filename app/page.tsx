@@ -1,8 +1,9 @@
+"use client";
 import AboutSection from "@/components/about";
 import ContactSection from "@/components/contectSection";
 import Footer from "@/components/footer";
 import Header from "@/components/Header";
-import Hero from "@/components/HeroSection";
+import HeroSection from "@/components/HeroSection";
 import KindWords from "@/components/KindWords";
 import ScrollCoordinator from "@/components/ScrollCoordinator";
 import SelectedProjects from "@/components/SelectedPage";
@@ -14,7 +15,7 @@ export default function Home() {
     <main>
       <ScrollCoordinator />
       <Header />
-      <Hero />
+      <HeroSection />
       <Skills />
       <AboutSection/>
       <SelectedProjects />
